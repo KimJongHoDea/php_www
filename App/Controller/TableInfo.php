@@ -16,7 +16,13 @@ class TableInfo
         if($uri->third() == "new") {
             print_r($_POST);
             if ($_POST) {
-                $query = "ALTER TABLE ".$uri->second()." add ".$_POST['fieldname']." varchar(255)";
+                if ($_POST['fieldtype']) {
+                    $fieldtype = $_POST['fieldtype'];
+                } else {
+                    $fieldtype = "varchar(255)";
+                }
+
+                $query = "ALTER TABLE ".$uri->second()." add ".$_POST['fieldname']." ".$fieldtype;
                 $result = $this->db->queryExecute($query);
 
                 // 페이지 이동
@@ -27,6 +33,24 @@ class TableInfo
             $body = file_get_contents("../Resource/desc_new.html");
             $body = str_replace("{{action}}","/TableInfo/".$uri->second()."/new",$body);
             echo $body;
+        } else if($uri->third() == "delete") {
+            // 테이블 삭제
+            $query = "DROP TABLES ".$uri->second();
+            echo $query." 테이블을 삭제합니다.";
+            $result = $this->db->queryExecute($query);
+
+            // 페이지 이동
+            header("location:"."/tables");
+
+        } else if($uri->third() == "init") {
+            // 테이블 삭제
+            $query = "TRUNCATE TABLE ".$uri->second();
+            echo $query." 테이블을 초기화 합니다.";
+            $result = $this->db->queryExecute($query);
+
+            // 페이지 이동
+            header("location:"."/tables");
+
         } else {
             // 목록출력
             $this->list();
